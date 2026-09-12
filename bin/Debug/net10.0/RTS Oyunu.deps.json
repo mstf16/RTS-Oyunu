@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "RTS Oyunu/1.0.0": {
+        "dependencies": {
+          "SDL2.Bindings": "1.1.0"
+        },
+        "runtime": {
+          "RTS Oyunu.dll": {}
+        }
+      },
+      "SDL2.Bindings/1.1.0": {
+        "runtime": {
+          "lib/netstandard2.1/SDL2.Bindings.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RTS Oyunu/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SDL2.Bindings/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-w297YhR2Zitmr0b6tRk6iPYnd7EAwJO8VB6YUqAqWflJYKKUKCRVILZrS5X6RFSCBIyujgoxwQEjGYarY9TJ7A==",
+      "path": "sdl2.bindings/1.1.0",
+      "hashPath": "sdl2.bindings.1.1.0.nupkg.sha512"
+    }
+  }
+}

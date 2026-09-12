@@ -1,0 +1,17 @@
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\RTS Oyunu.exe
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\RTS Oyunu.deps.json
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\RTS Oyunu.runtimeconfig.json
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\RTS Oyunu.dll
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\RTS Oyunu.pdb
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.GeneratedMSBuildEditorConfig.editorconfig
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.AssemblyInfoInputs.cache
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.AssemblyInfo.cs
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.csproj.CoreCompileInputs.cache
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.dll
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\refint\RTS Oyunu.dll
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.pdb
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.genruntimeconfig.cache
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\ref\RTS Oyunu.dll
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.csproj.AssemblyReference.cache
+C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\SDL2.Bindings.dll
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.csproj.Up2Date
