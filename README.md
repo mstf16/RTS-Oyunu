@@ -18,7 +18,7 @@ This software is provided with the explicit condition that it must **not** be mo
 * Any individual or entity that distributes this project as or within malware shall be subject to the maximum criminal and civil penalties under the penal codes of their respective jurisdiction/country. The original creators disclaim all liability for any such malicious use.
 
 ### 3. Copyright, Commercialization, & Asset Restrictions
-* **Graphic Models:** All graphics, textures, and 3D models included in this project are strictly for **testing and educational purposes only**. They may not be used in any commercial product.
+* **Graphic Models:** All graphics, textures, and models included in this project are strictly for **testing and educational purposes only**. They may not be used in any commercial product.
 * **Commercial 1:1 Cloning Prohibited:** While modification for learning or individual open-source contribution is permitted, the commercial exploitation of this project through excessive 1:1 replication, direct cloning, or nearly identical copying of its unique core mechanics and code structure is strictly prohibited and constitutes an **infringement of copyright laws**.
 
 ---
