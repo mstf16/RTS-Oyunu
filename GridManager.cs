@@ -30,6 +30,10 @@ namespace RTSProje
         // Arsalarda kim oturuyor defteri (Her arsada bir EntityHandle yatar)
         private readonly EntityHandle[] _occupancy;
 
+        // Her arsanın zemin türünü tutan ayrı bir defter - "burası
+        // yol mu çamur mu su mu" bilgisi burada saklanıyor.
+        private readonly TerrainType[] _terrain;
+
         private bool _isInitialized;
 
         public GridManager(int gridWidth, int gridHeight, int initialScreenWidth, int initialScreenHeight)
@@ -41,6 +45,9 @@ namespace RTSProje
 
             _occupancy = new EntityHandle[GridWidth * GridHeight];
             Array.Fill(_occupancy, EntityHandle.Invalid); // Başta tüm arsalar bomboş
+
+            _terrain = new TerrainType[GridWidth * GridHeight];
+            Array.Fill(_terrain, TerrainType.Grass); // Başta her yer düz çimen
 
             RecalculateCellSize();
         }
@@ -224,6 +231,30 @@ namespace RTSProje
                     }
                 }
             }
+        }
+
+        // ------------------------------------------------------------
+        // ZEMİN TÜRÜ SORGULARI (TerrainPhysics bunu kullanacak)
+        // ------------------------------------------------------------
+
+        // Bir arsanın zemin türünü değiştirir (örn. harita tasarlarken
+        // "burası bataklık olsun" demek için).
+        public void SetTerrainType(int gridX, int gridY, TerrainType terrainType)
+        {
+            EnsureInitialized();
+            if (!IsWithinBounds(gridX, gridY)) return;
+
+            _terrain[ToIndex(gridX, gridY)] = terrainType;
+        }
+
+        // Bir arsanın zemin türünü öğrenir. Harita dışıysa varsayılan
+        // olarak Çimen döneriz (pratik bir güvenlik önlemi).
+        public TerrainType GetTerrainType(int gridX, int gridY)
+        {
+            EnsureInitialized();
+            if (!IsWithinBounds(gridX, gridY)) return TerrainType.Grass;
+
+            return _terrain[ToIndex(gridX, gridY)];
         }
     }
 }

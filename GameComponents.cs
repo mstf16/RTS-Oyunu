@@ -234,5 +234,75 @@ public struct SupplyNode
     public bool IsNetworkRoot;
 }
 
+
+// ------------------------------------------------------------
+// TERRAIN TYPE
+// Bir şehir planı düşün: bazı yerler asfalt, bazı yerler çamurlu
+// tarla, bazı yerler bataklık, bazı yerler de gölet. Her birinin
+// üzerinde yürümek farklı zorlukta. Bu enum, haritadaki her
+// hücrenin HANGİ zemin türünde olduğunu tutar - GridManager
+// bunu hücre bazında saklayacak, TerrainPhysics de bu bilgiye
+// bakıp birimin hızını ona göre ayarlayacak.
+// ------------------------------------------------------------
+public enum TerrainType : byte
+{
+    Grass = 0,   // Normal çimen - hız çarpanı 1.0
+    Road = 1,    // Yol - hız çarpanı yüksek (örn. 1.3)
+    Swamp = 2,   // Bataklık - hız çarpanı düşük (örn. 0.5)
+    Water = 3    // Su - neredeyse hiç ilerlenemez (örn. 0.05)
+}
+
+// ------------------------------------------------------------
+// RESOURCE DEPOSIT (Maden/Kaynak Yatağı)
+// Red Alert 2 mantığı: Kaynak azaldıkça verim düşer, zamanla tazelenir.
+// ------------------------------------------------------------
+[StructLayout(LayoutKind.Sequential)]
+public struct ResourceDeposit
+{
+    public ResourceType Type;              // Kaynak türü (Wood/Stone/Food/Gold)
+    public float CurrentAmount;            // Mevcut miktar
+    public float MaxAmount;                // Maksimum kapasite
+    public float DepletionThreshold;       // Verim düşme eşiği
+    public float FullYieldRate;            // Saniyede çıkarılan standart miktar
+    public float DepletedYieldMultiplier;  // Eşik altı verim çarpanı
+    public float RegenRatePerSecond;       // Saniyelik tazelenme hızı
+    public bool RegenPaused;               // Yenilenme durduruldu mu?
+}
+
+// ------------------------------------------------------------
+// WORKER STATE (İşçinin Görev Durumu)
+// İşçinin döngüdeki yerini belirleyen State Machine.
+// ------------------------------------------------------------
+public enum WorkerStateType : byte
+{
+    Idle = 0,           // Bekliyor
+    MovingToNode = 1,   // Kaynağa gidiyor
+    Harvesting = 2,     // Topluyor
+    MovingToDropoff = 3,// Depoya dönüyor
+    Depositing = 4      // Boşaltıyor
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct WorkerState
+{
+    public WorkerStateType CurrentState;
+    public EntityHandle AssignedNode;      // Atanan kaynak yatağı
+    public EntityHandle AssignedDropoff;   // Atanan boşaltma binası
+}
+
+// ------------------------------------------------------------
+// GARRISON TAG (Kışla/Bina İçi Durumu)
+// Bir askerin dışarıda mı yoksa bir binanın koruması altında mı 
+// olduğunu belirtir. Binadaki askerler hareket etmez ve 
+// dışarıdan gelen saldırılara (binanın canı bitene kadar) kapalıdır.
+// ------------------------------------------------------------
+[StructLayout(LayoutKind.Sequential)]
+public struct GarrisonTag
+{
+    public bool IsGarrisoned;         // Asker şu an binanın içinde mi?
+    public EntityHandle BuildingHandle; // Hangi binanın içinde?
+}
+
+
 }
 

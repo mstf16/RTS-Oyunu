@@ -72,7 +72,7 @@ namespace RTSProje
                 int buildingGridX = _positions![building.Index].GridX;
                 int buildingGridY = _positions[building.Index].GridY;
 
-                float nearestDistance = float.MaxValue;
+                float nearestDistSq = float.MaxValue;
                 bool coveredByConnectedNode = false;
 
                 for (int s = 0; s < _supplyCount; s++)
@@ -85,33 +85,42 @@ namespace RTSProje
 
                     float dx = buildingGridX - _positions[supply.Index].GridX;
                     float dy = buildingGridY - _positions[supply.Index].GridY;
-                    float distance = MathF.Sqrt(dx * dx + dy * dy);
+                    float distSq = dx * dx + dy * dy; // Karekök YOK! Saf çarpma ve toplama.
 
-                    if (distance < nearestDistance)
+                    if (distSq < nearestDistSq)
                     {
-                        nearestDistance = distance;
+                        nearestDistSq = distSq;
                     }
 
                     bool sameTeamAsSupply = _ownerTags![building.Index].TeamId == _ownerTags[supply.Index].TeamId;
+                    float supplyRadius = _supplyNodes![supply.Index].Radius;
 
-                    if (sameTeamAsSupply && _isConnected[supply.Index] && distance <= _supplyNodes![supply.Index].Radius)
+                    // Mesafe menzilden küçük mü? dist <= R yerine distSq <= R * R
+                    if (sameTeamAsSupply && _isConnected[supply.Index] && distSq <= (supplyRadius * supplyRadius))
                     {
                         coveredByConnectedNode = true;
                     }
                 }
 
                 float confidence;
+                float nearestDistance = float.MaxValue;
 
                 if (coveredByConnectedNode)
                 {
                     confidence = 1f;
+                    // Şebekeye tam bağlıysa metre hesabı kritik değil ama güven tam
+                    nearestDistance = nearestDistSq == float.MaxValue ? -1f : MathF.Sqrt(nearestDistSq);
                 }
-                else if (nearestDistance == float.MaxValue)
+                else if (nearestDistSq == float.MaxValue)
                 {
                     confidence = 0f;
+                    nearestDistance = -1f;
                 }
                 else
                 {
+                    // YALNIZCA şebekeden kopuksa ve ceza puanı hesaplanacaksa TEK BİR KEZ karekök alıyoruz!
+                    nearestDistance = MathF.Sqrt(nearestDistSq);
+
                     float threshold = _buildingConfidences![building.Index].MaxRoadDistanceThreshold;
                     float dropRate = _buildingConfidences[building.Index].ConfidenceDropRatePerTile;
 
@@ -129,7 +138,7 @@ namespace RTSProje
                     }
                 }
 
-                _buildingConfidences![building.Index].DistanceToRoad = nearestDistance == float.MaxValue ? -1f : nearestDistance;
+                _buildingConfidences![building.Index].DistanceToRoad = nearestDistance;
                 _buildingConfidences[building.Index].ConfidenceValue = confidence;
             }
         }
@@ -189,11 +198,13 @@ namespace RTSProje
 
                     float dx = currentGridX - _positions[candidate.Index].GridX;
                     float dy = currentGridY - _positions[candidate.Index].GridY;
-                    float distance = MathF.Sqrt(dx * dx + dy * dy);
+                    float distSq = dx * dx + dy * dy;
 
                     bool sameTeam = _ownerTags![current.Index].TeamId == _ownerTags[candidate.Index].TeamId;
+                    float candRadius = _supplyNodes[candidate.Index].Radius;
 
-                    if (sameTeam && (distance <= currentRadius || distance <= _supplyNodes[candidate.Index].Radius))
+                    // Mesafe iki düğümden birinin menziline giriyor mu? (Karesel kıyaslama)
+                    if (sameTeam && (distSq <= (currentRadius * currentRadius) || distSq <= (candRadius * candRadius)))
                     {
                         _isConnected[candidate.Index] = true;
                         _bfsQueue[queueTail] = candidate;
@@ -263,6 +274,66 @@ namespace RTSProje
                     return;
                 }
             }
+        }
+
+        // ------------------------------------------------------------
+        // DIŞARIYA AÇIK SORGU KAPILARI
+        // System_FogOfWar gibi başka sistemlerin, aynı BFS hesabını
+        // tekrar yazmadan bu sınıfın zaten bildiği tedarik ağı
+        // bilgisini sorabilmesi için.
+        // ------------------------------------------------------------
+
+        // Bu nokta, aynı takımdan bağlı bir tedarik binasının
+        // menzili içinde mi? (Tam kapsama = "şebeke tam çekiyor")
+        public bool IsPositionFullyCovered(int gridX, int gridY, int teamId)
+        {
+            for (int s = 0; s < _supplyCount; s++)
+            {
+                EntityHandle supply = _supplyEntities[s];
+                if (!World.IsAlive(supply)) continue;
+                if (_ownerTags![supply.Index].TeamId != teamId) continue;
+                if (!_isConnected[supply.Index]) continue;
+
+                float dx = gridX - _positions![supply.Index].GridX;
+                float dy = gridY - _positions[supply.Index].GridY;
+                float distSq = dx * dx + dy * dy; // Karekök YOK
+
+                float radius = _supplyNodes![supply.Index].Radius;
+                if (distSq <= radius * radius)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Bu noktaya, aynı takımdan (bağlı olsun olmasın) en yakın
+        // tedarik binası ne kadar uzakta? Hiç yoksa float.MaxValue döner.
+        public float GetNearestSupplyDistance(int gridX, int gridY, int teamId)
+        {
+            float nearestSq = float.MaxValue;
+
+            for (int s = 0; s < _supplyCount; s++)
+            {
+                EntityHandle supply = _supplyEntities[s];
+                if (!World.IsAlive(supply)) continue;
+                if (_ownerTags![supply.Index].TeamId != teamId) continue;
+
+                float dx = gridX - _positions![supply.Index].GridX;
+                float dy = gridY - _positions[supply.Index].GridY;
+                float distSq = dx * dx + dy * dy; // Karekök YOK
+
+                if (distSq < nearestSq)
+                {
+                    nearestSq = distSq;
+                }
+            }
+
+            // Çağıran taraf (System_FogOfWar) gerçek mesafe değeriyle
+            // hesap yapıyor - burada TEK BİR KERE, döngü BİTTİKTEN
+            // SONRA kök alıyoruz.
+            return nearestSq == float.MaxValue ? float.MaxValue : MathF.Sqrt(nearestSq);
         }
 
         public void PruneDeadEntries()

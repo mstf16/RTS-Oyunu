@@ -81,8 +81,8 @@ Bu dosya, projedeki **istisnasız tüm dosyaların** ne işe yaradığını, gü
   * Şehir merkezine yakın kurulan depolar ve karakollar bu sinyali yakalayıp menzili ileriye taşır (BFS dalga yayılımı).
   * Bir bina (kışla, maden ocağı vb.) bu şebekenin menzili içindeyse tam verimle (Güven = 1.0) çalışır.
   * Şebekeden kopuksa veya çok uzaktaysa mesafeye göre morali/güveni kademe kademe erir.
+* **Karekök Optimizasyonu ($dx^2 + dy^2 \le R^2$):** Döngü içinde saniyede on binlerce kez pahalı `MathF.Sqrt` çağırmak yerine mesafenin karesi üzerinden kıyaslama yapılır. Karekök yalnızca ceza çarpanı hesabı için en sonda 1 kez alınır.
 * **Şifreli Ağ (Takım Kontrolü):** Komşunun WiFi'ına kaçak bağlanamazsın! Düşmanın kurduğu şebekeden bizim binalar sinyal çalamaz; sadece kendi rengimizdeki üslerden sinyal yayılır.
-* **Zero-GC BFS:** Ağ haritasını hesaplarken asla `new Queue()` açılmaz; baştan ayrılmış sabit `_bfsQueue` dizisiyle bellek tertemiz tutulur.
 
 ---
 
@@ -126,3 +126,18 @@ Bu dosya, projedeki **istisnasız tüm dosyaların** ne işe yaradığını, gü
 
 ### 📄 `Program.cs` (Fabrikanın Ana Giriş Kapısı)
 * **Günlük Hayat Karşılığı:** Sabah fabrikayı açan baş usta. Konsoldan harita ölçüsünü alır, pencereyi kurar, ustaları sıraya dizer ve ana şalteri kaldırıp oyunu başlatır.
+
+---
+
+## 4. 🚀 Kutsal Seviye (God Tier) Optimizasyon Yol Haritası
+*(Bu bölüm Faz 5 tamamlandıktan sonra, Faz 6 grafik katmanına geçilmeden önce motora uygulanacaktır!)*
+
+1. **SIMD (Single Instruction, Multiple Data - Vektörleştirme):**
+   * *Bakkal Mantığı:* Yumurtaları tek tek teraziye koymak yerine 8 gözlü teraziyle 8 yumurtayı tek seferde tartmak.
+   * *Uygulama:* `System.Runtime.Intrinsics` ile 8 askerin hareket/fizik hesabı tek bir CPU saat döngüsünde yapılacak.
+2. **Spatial Partitioning (Uzamsal / Mahalle Bölümlemesi):**
+   * *Bakkal Mantığı:* Kadıköy'deki arıza için Beylikdüzü'ndeki vanayı boşuna kontrol etmemek.
+   * *Uygulama:* $O(B \times S)$ karmaşıklığını bitirip, binaları sadece kendi mahallelerindeki tedarik noktalarıyla eşleştirmek ($O(1)$ yakınsama).
+3. **Multithreading (Çoklu İş Parçacığı / Çift Vardiya):**
+   * *Bakkal Mantığı:* Sıvacı bir duvarda çalışırken boyacının öbür odada çalışması.
+   * *Uygulama:* Birbirine bağımlı olmayan sistemleri (`TerrainPhysics` ve `BuildingStateMonitor` gibi) ayrı çekirdeklere dağıtmak.

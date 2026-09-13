@@ -57,6 +57,16 @@ namespace RTSProje
             { ResourceType.Food, 30 }
         };
         public float BuildTimeSeconds { get; set; } = 10f;
+
+        // Koçbaşı/mancınık gibi kuşatma birimleri askere karşı zayıf,
+        // binaya karşı devasa hasar verir. 0 ise "sıradan birim,
+        // binalara özel bir avantajı yok" demek.
+        public float SiegeDamageBonusVsBuildings { get; set; } = 0f;
+
+        // Kuşatma birimi mi? System_DynamicSynergy ve CombatResolver
+        // (Faz 5) bu bayrağa bakıp "kuşatma mancınığı yakalandı,
+        // savunmasız" gibi kuralları buradan tetikleyecek.
+        public bool IsSiegeUnit { get; set; } = false;
     }
 
     public class BuildingStatData
@@ -68,6 +78,28 @@ namespace RTSProje
         public float ConfidenceDropRatePerTile { get; set; } = 0.15f; // Her adımda verim kaç puan erisin?
         public int MaxGarrisonCap { get; set; } = 2; // İçine kaç muhafız alabilir?
         public float BaseProductionSpeed { get; set; } = 1.0f;
+
+        public Dictionary<ResourceType, int> ProductionCost { get; set; } = new Dictionary<ResourceType, int>
+        {
+            { ResourceType.Wood, 100 }
+        };
+
+        // Bina haritada kaç hücre kaplıyor (örn. 3x3 bir kışla).
+        public int FootprintWidth { get; set; } = 2;
+        public int FootprintHeight { get; set; } = 2;
+
+        // Bu binayı inşa etmek için hangi evrede (Tier) olman lazım?
+        public int RequiredTier { get; set; } = 1;
+
+        // Bu bina inşa edildiğinde takımın evresini bir üst seviyeye
+        // mi çıkarıyor? (Örn. "Tier 2 Konağı" inşa edince Tier 2'ye geçilir.)
+        public bool IsTierAdvancementBuilding { get; set; } = false;
+
+        // Tedarik ağı (SupplyNode) özellikleri - her bina değil, sadece
+        // özel olarak işaretlenmiş binalar sinyal yayar.
+        public bool IsSupplyNode { get; set; } = false;
+        public float SupplyRadius { get; set; } = 0f;
+        public bool IsNetworkRoot { get; set; } = false; // Ana üs (Town Center) burada true olur
     }
 
 
@@ -265,70 +297,132 @@ namespace RTSProje
         {
             return new List<UnitStatData>
             {
+                // 1) ET SİPERİ - 0 altın, kalabalık, düşmanın ilk vuruşunu göğüsler
                 new UnitStatData
                 {
-                    UnitId = "unit_worker",
-                    DisplayName = "Amele / İşçi",
+                    UnitId = "unit_shield_bearer",
+                    DisplayName = "Et Siperi",
                     UnitClass = UnitClass.Melee,
-                    MaxHealth = 50f,
-                    AttackDamage = 3f,
+                    MaxHealth = 90f,
+                    AttackDamage = 6f,
                     AttackRange = 1f,
-                    AttackCooldown = 1.2f,
-                    ArmorValue = 0f,
-                    MoveSpeed = 3.2f,
+                    AttackCooldown = 1.1f,
+                    ArmorValue = 1f,
+                    MoveSpeed = 3.0f,
                     VisionRadius = 6f,
-                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 40 }, { ResourceType.Food, 50 } },
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 30 }, { ResourceType.Food, 20 } },
                     BuildTimeSeconds = 6f
                 },
+
+                // 2) TACİZCİ - 0 altın, hafif menzilli, vur-kaç
                 new UnitStatData
                 {
-                    UnitId = "unit_infantry",
-                    DisplayName = "Kılıçlı Yiğit",
-                    UnitClass = UnitClass.Melee,
-                    MaxHealth = 120f,
-                    AttackDamage = 14f,
-                    AttackRange = 1.2f,
-                    AttackCooldown = 0.9f,
-                    ArmorValue = 3f,
-                    MoveSpeed = 2.8f,
-                    VisionRadius = 7f,
-                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 60 }, { ResourceType.Food, 40 } },
-                    BuildTimeSeconds = 12f
-                },
-                new UnitStatData
-                {
-                    UnitId = "unit_archer",
-                    DisplayName = "Yaylı Okçu",
+                    UnitId = "unit_skirmisher",
+                    DisplayName = "Tacizci",
                     UnitClass = UnitClass.Ranged,
-                    MaxHealth = 70f,
-                    AttackDamage = 10f,
-                    AttackRange = 5.5f,
-                    AttackCooldown = 1.4f,
-                    ArmorValue = 1f,
-                    MoveSpeed = 2.7f,
-                    VisionRadius = 9f,
-                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 75 }, { ResourceType.Food, 45 } },
-                    BuildTimeSeconds = 14f
+                    MaxHealth = 45f,
+                    AttackDamage = 8f,
+                    AttackRange = 4.5f,
+                    AttackCooldown = 1.3f,
+                    ArmorValue = 0f,
+                    MoveSpeed = 3.3f,
+                    VisionRadius = 7f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 35 }, { ResourceType.Food, 25 } },
+                    BuildTimeSeconds = 7f
                 },
+
+                // 3) ZIRHLI HAT ASKERİ - altın ister, ordunun omurgası
                 new UnitStatData
                 {
-                    UnitId = "unit_knight_elite",
-                    DisplayName = "Zırhlı Süvari (Elit)",
+                    UnitId = "unit_line_guard",
+                    DisplayName = "Zırhlı Hat Askeri",
+                    UnitClass = UnitClass.Melee,
+                    MaxHealth = 150f,
+                    AttackDamage = 16f,
+                    AttackRange = 1.2f,
+                    AttackCooldown = 1.0f,
+                    ArmorValue = 5f,
+                    MoveSpeed = 2.6f,
+                    VisionRadius = 7f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 50 }, { ResourceType.Food, 30 }, { ResourceType.Gold, 15 } },
+                    BuildTimeSeconds = 13f
+                },
+
+                // 4) AĞIR MENZİLLİ - altın ister, zırh delen, arkadan vurur
+                new UnitStatData
+                {
+                    UnitId = "unit_heavy_ranged",
+                    DisplayName = "Ağır Menzilli",
+                    UnitClass = UnitClass.Ranged,
+                    MaxHealth = 65f,
+                    AttackDamage = 20f,
+                    AttackRange = 6f,
+                    AttackCooldown = 1.5f,
+                    ArmorValue = 1f,
+                    MoveSpeed = 2.5f,
+                    VisionRadius = 9f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 60 }, { ResourceType.Gold, 25 } },
+                    BuildTimeSeconds = 16f
+                },
+
+                // 5) ELİT / ŞOK - pahalı, tek başına tehlikeli ama korumasız kalırsa savunmasız
+                new UnitStatData
+                {
+                    UnitId = "unit_elite_shock",
+                    DisplayName = "Elit Şok Birliği",
                     UnitClass = UnitClass.Elite,
-                    MaxHealth = 220f,
-                    AttackDamage = 26f,
+                    MaxHealth = 200f,
+                    AttackDamage = 30f,
                     AttackRange = 1.4f,
                     AttackCooldown = 1.1f,
                     ArmorValue = 6f,
-                    MoveSpeed = 3.6f,
+                    MoveSpeed = 3.4f,
                     VisionRadius = 8f,
-                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 120 }, { ResourceType.Food, 150 } },
-                    BuildTimeSeconds = 25f
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 80 }, { ResourceType.Food, 60 }, { ResourceType.Gold, 60 } },
+                    BuildTimeSeconds = 26f
+                },
+
+                // 6) YAKIN KUŞATMA (KOÇBAŞI) - askere hantal, binaya balyoz gibi
+                new UnitStatData
+                {
+                    UnitId = "unit_battering_ram",
+                    DisplayName = "Koçbaşı",
+                    UnitClass = UnitClass.Melee,
+                    MaxHealth = 180f,
+                    AttackDamage = 5f,
+                    AttackRange = 1f,
+                    AttackCooldown = 1.6f,
+                    ArmorValue = 4f,
+                    MoveSpeed = 1.6f,
+                    VisionRadius = 5f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 100 }, { ResourceType.Gold, 20 } },
+                    BuildTimeSeconds = 22f,
+                    SiegeDamageBonusVsBuildings = 75f,
+                    IsSiegeUnit = true
+                },
+
+                // 7) UZAK KUŞATMA (MANCINIK) - uzun menzil, yakalanırsa kırılgan
+                new UnitStatData
+                {
+                    UnitId = "unit_catapult",
+                    DisplayName = "Mancınık",
+                    UnitClass = UnitClass.Ranged,
+                    MaxHealth = 70f,
+                    AttackDamage = 4f,
+                    AttackRange = 8f,
+                    AttackCooldown = 2.5f,
+                    ArmorValue = 0f,
+                    MoveSpeed = 1.2f,
+                    VisionRadius = 8f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 90 }, { ResourceType.Gold, 40 } },
+                    BuildTimeSeconds = 24f,
+                    SiegeDamageBonusVsBuildings = 100f,
+                    IsSiegeUnit = true
                 }
             };
         }
 
-        private static List<BuildingStatData> CreateDefaultBuildingList()
+                private static List<BuildingStatData> CreateDefaultBuildingList()
         {
             return new List<BuildingStatData>
             {
@@ -340,7 +434,14 @@ namespace RTSProje
                     MaxRoadDistanceThreshold = 12f,
                     ConfidenceDropRatePerTile = 0.05f,
                     MaxGarrisonCap = 5,
-                    BaseProductionSpeed = 1.0f
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int>(),
+                    FootprintWidth = 3,
+                    FootprintHeight = 3,
+                    RequiredTier = 1,
+                    IsSupplyNode = true,
+                    SupplyRadius = 14f,
+                    IsNetworkRoot = true // Ana üs - tedarik ağının kalbi
                 },
                 new BuildingStatData
                 {
@@ -350,7 +451,11 @@ namespace RTSProje
                     MaxRoadDistanceThreshold = 5f,
                     ConfidenceDropRatePerTile = 0.15f,
                     MaxGarrisonCap = 2,
-                    BaseProductionSpeed = 1.0f
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 120 } },
+                    FootprintWidth = 2,
+                    FootprintHeight = 2,
+                    RequiredTier = 1
                 },
                 new BuildingStatData
                 {
@@ -360,7 +465,73 @@ namespace RTSProje
                     MaxRoadDistanceThreshold = 4f,
                     ConfidenceDropRatePerTile = 0.20f,
                     MaxGarrisonCap = 3,
-                    BaseProductionSpeed = 1.0f
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 60 } },
+                    FootprintWidth = 2,
+                    FootprintHeight = 2,
+                    RequiredTier = 1
+                },
+               
+                               new BuildingStatData
+                {
+                    BuildingId = "building_farm",
+                    DisplayName = "Tarla",
+                    MaxHealth = 250f,
+                    MaxRoadDistanceThreshold = 8f,
+                    ConfidenceDropRatePerTile = 0.10f,
+                    MaxGarrisonCap = 1,
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 70 } },
+                    FootprintWidth = 2,
+                    FootprintHeight = 2,
+                    RequiredTier = 1
+                },
+
+                new BuildingStatData
+                {
+                    BuildingId = "building_supply_post",
+                    DisplayName = "Tedarik Karakolu",
+                    MaxHealth = 250f,
+                    MaxRoadDistanceThreshold = 10f,
+                    ConfidenceDropRatePerTile = 0.10f,
+                    MaxGarrisonCap = 1,
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 80 } },
+                    FootprintWidth = 1,
+                    FootprintHeight = 1,
+                    RequiredTier = 1,
+                    IsSupplyNode = true,
+                    SupplyRadius = 9f
+                },
+                new BuildingStatData
+                {
+                    BuildingId = "building_tier2_hall",
+                    DisplayName = "Gelişmiş Konak (Tier 2)",
+                    MaxHealth = 1200f,
+                    MaxRoadDistanceThreshold = 12f,
+                    ConfidenceDropRatePerTile = 0.05f,
+                    MaxGarrisonCap = 3,
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 250 }, { ResourceType.Food, 150 } },
+                    FootprintWidth = 3,
+                    FootprintHeight = 3,
+                    RequiredTier = 1,
+                    IsTierAdvancementBuilding = true
+                },
+                new BuildingStatData
+                {
+                    BuildingId = "building_tier3_hall",
+                    DisplayName = "Gelişmiş Konak (Tier 3)",
+                    MaxHealth = 1800f,
+                    MaxRoadDistanceThreshold = 12f,
+                    ConfidenceDropRatePerTile = 0.05f,
+                    MaxGarrisonCap = 4,
+                    BaseProductionSpeed = 1.0f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Wood, 400 }, { ResourceType.Food, 250 }, { ResourceType.Gold, 100 } },
+                    FootprintWidth = 3,
+                    FootprintHeight = 3,
+                    RequiredTier = 2,
+                    IsTierAdvancementBuilding = true
                 }
             };
         }
