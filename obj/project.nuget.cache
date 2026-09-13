@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4GIrVIPwijQ=",
+  "dgSpecHash": "gCg2yL0grSM=",
   "success": true,
-  "projectFilePath": "c:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
+  "projectFilePath": "C:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mustafa\\.nuget\\packages\\sdl2.bindings\\1.1.0\\sdl2.bindings.1.1.0.nupkg.sha512"
   ],

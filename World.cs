@@ -92,6 +92,10 @@ namespace RTSProje
             _freeIds[_freeTop] = handle.Index;
             _freeTop++;
             _activeCount--;
+
+            // Resepsiyon anonsu: "bu oda boşaldı" - dinleyen tüm
+            // sistemler kendi defterlerinden bu kaydı hemen silsin.
+            EventManager.Publish(new EntityDestroyedEvent { Handle = handle });
         }
 
         // ------------------------------------------------------------

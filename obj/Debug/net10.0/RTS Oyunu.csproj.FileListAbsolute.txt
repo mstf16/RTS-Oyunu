@@ -15,3 +15,4 @@ C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\ref\RTS Oyunu.dll
 C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.csproj.AssemblyReference.cache
 C:\C Projesi\RTS Oyunu\bin\Debug\net10.0\SDL2.Bindings.dll
 C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.csproj.Up2Date
+C:\C Projesi\RTS Oyunu\obj\Debug\net10.0\RTS Oyunu.sourcelink.json

@@ -44,6 +44,10 @@ namespace RTSProje
             _supplyNodes = World.GetArray<SupplyNode>();
             _ownerTags = World.GetArray<OwnerTag>();
             _isInitialized = true;
+
+            // Bir entity yok edilince anında haberimiz olsun, aylarca
+            // birikmiş ölü kayıt taramaya gerek kalmasın.
+            EventManager.Subscribe<EntityDestroyedEvent>(OnEntityDestroyed);
         }
 
         public void Update(float deltaTime)
@@ -132,7 +136,15 @@ namespace RTSProje
 
         public void Shutdown()
         {
-            // Bu sistemde bir olaya abone olunmadığı için temizlenecek bir şey yok.
+            EventManager.Unsubscribe<EntityDestroyedEvent>(OnEntityDestroyed);
+        }
+
+        // İsimlendirilmiş metod (lambda değil) - bir entity öldüğünde
+        // hem bina hem tedarik defterinden anında siliyoruz.
+        private void OnEntityDestroyed(EntityDestroyedEvent e)
+        {
+            UnregisterBuilding(e.Handle);
+            UnregisterSupplyNode(e.Handle);
         }
 
         private void RecomputeNetwork()
@@ -190,9 +202,17 @@ namespace RTSProje
                 }
             }
         }
-
+// Aynı bina yanlışlıkla iki kere kaydedilmeye çalışılırsa ikisini de kaydetme - deftere aynı isim iki kere yazılmasın.
         public void RegisterSupplyNode(EntityHandle supply)
         {
+            for (int i = 0; i < _supplyCount; i++)
+            {
+                if (_supplyEntities[i].Equals(supply))
+                {
+                    return;
+                }
+            }
+
             if (_supplyCount >= _supplyEntities.Length) return;
 
             _supplyEntities[_supplyCount] = supply;
@@ -216,6 +236,16 @@ namespace RTSProje
 
         public void RegisterBuilding(EntityHandle building)
         {
+            // Aynı bina yanlışlıkla iki kere kaydedilmeye çalışılırsa
+            // sessizce reddet - deftere aynı isim iki kere yazılmasın.
+            for (int i = 0; i < _buildingCount; i++)
+            {
+                if (_buildingEntities[i].Equals(building))
+                {
+                    return;
+                }
+            }
+
             if (_buildingCount >= _buildingEntities.Length) return;
 
             _buildingEntities[_buildingCount] = building;

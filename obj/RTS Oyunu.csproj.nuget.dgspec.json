@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj": {}
+    "C:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj": {}
   },
   "projects": {
-    "c:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj": {
+    "C:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
+        "projectUniqueName": "C:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
         "projectName": "RTS Oyunu",
-        "projectPath": "c:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
+        "projectPath": "C:\\C Projesi\\RTS Oyunu\\RTS Oyunu.csproj",
         "packagesPath": "C:\\Users\\Mustafa\\.nuget\\packages\\",
-        "outputPath": "c:\\C Projesi\\RTS Oyunu\\obj\\",
+        "outputPath": "C:\\C Projesi\\RTS Oyunu\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Mustafa\\AppData\\Roaming\\NuGet\\NuGet.Config"

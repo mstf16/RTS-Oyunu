@@ -24,6 +24,7 @@ namespace RTSProje
         {
             _buildingConfidences = World.GetArray<BuildingConfidence>();
             _isInitialized = true;
+            EventManager.Subscribe<EntityDestroyedEvent>(OnEntityDestroyed);
         }
 
         public void Update(float deltaTime)
@@ -53,11 +54,24 @@ namespace RTSProje
 
         public void Shutdown()
         {
-            // Bu sistemde bir olaya abone olunmadığı için temizlenecek bir şey yok.
+            EventManager.Unsubscribe<EntityDestroyedEvent>(OnEntityDestroyed);
+        }
+
+        private void OnEntityDestroyed(EntityDestroyedEvent e)
+        {
+            UnregisterBuilding(e.Handle);
         }
 
         public void RegisterBuilding(EntityHandle building)
         {
+            for (int i = 0; i < _buildingCount; i++)
+            {
+                if (_buildingEntities[i].Equals(building))
+                {
+                    return;
+                }
+            }
+
             if (_buildingCount >= _buildingEntities.Length) return;
 
             _buildingEntities[_buildingCount] = building;
