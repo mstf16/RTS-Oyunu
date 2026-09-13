@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RTS Oyunu")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a55e0862c46fe684ef56f30f410ab2dcb9c4dce8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d5c06a311344761d41404c7a74018502e066952")]
 [assembly: System.Reflection.AssemblyProductAttribute("RTS Oyunu")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RTS Oyunu")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
