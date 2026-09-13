@@ -23,13 +23,3 @@ This project explores how far low-tier hardware and free AI tools can be pushed 
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-* Offline/Local development setup (VS Code or compatible engine runtime).
-* Local LLM runtime (e.g., Ollama with Qwen 2.5 3B) if you want to continue vibe coding on the codebase offline.
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/your-username/vibe-coding-rts.git](https://github.com/your-username/vibe-coding-rts.git)
