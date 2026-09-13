@@ -1,27 +1,35 @@
---- CODE LICENSE (MIT License) ---
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software source code files (the "Software"), to deal in the Software 
-without restriction, including without limitation the rights to use, copy, 
-modify, merge, publish, distribute, sublicense, and/or sell copies of the 
-Software, subject to the following conditions:
+PolyForm Noncommercial License 1.0.0
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Copyright (c) 2026 VIBE CODING Project Contributors
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+---
 
---- GRAPHICS & ASSETS LICENSE (All Rights Reserved) ---
-All rights to the graphics, visual assets, artwork, images, and user interface 
-designs included in or associated with this Software are strictly reserved by 
-the copyright holder. 
+### SECTION 1: GRANT OF RIGHTS & PERMISSIONS
+Subject to the terms and conditions of this license, the original authors hereby grant you a royalty-free, non-exclusive license to exercise the following rights regarding the software and documentation (the "Software"):
+* **Use & Execution:** You may run, execute, and inspect the Software.
+* **Modification & Adaptation:** You may modify, create derivative works, and adapt the Software for personal, research, or testing needs.
+* **Distribution:** You may copy, share, and redistribute the Software or derivative works.
 
-Notwithstanding the code license above, no permission is granted to copy, 
-reproduce, distribute, modify, or use these graphics and visual assets for 
-either commercial or personal purposes without prior written consent from 
-the copyright holder.
+---
+
+### SECTION 2: NONCOMMERCIAL RESTRICTIONS & CLONING BANS
+The permissions granted in Section 1 are explicitly limited by the following non-commercial boundaries:
+* **Noncommercial Boundary:** You may ONLY exercise your rights for noncommercial, educational, academic, or personal research purposes. Any direct or indirect monetary gain, commercial deployment, or commercial exploitation is strictly prohibited.
+* **1:1 Commercial Cloning Ban:** You may not create, publish, or distribute direct 1:1 clones, re-skins, or substantially identical commercial copies of this project's core engine mechanics, codebase structure, or unit systems.
+
+---
+
+### SECTION 3: ASSET & GRAPHICAL BOUNDARIES
+* **Testing & Educational Scope:** All graphic models, 2D textures, visual elements, and media files bundled within this repository are provided solely as temporary testing placeholders and educational assets.
+* **Extraction & Commercial Reuse:** Extracting, reusing, or redistributing any bundled visual/graphical asset within a commercial product or third-party paid application is strictly forbidden.
+
+---
+
+### SECTION 4: MISUSE, MALWARE & LEGAL COMPLIANCE
+* **Absolute Abuse Restriction:** The Software must NEVER be repackaged, modified, or distributed to carry, facilitate, or execute malware, viruses, trojans, ransomware, spyware, or any unauthorized systems tracking.
+* **Liability Disclaimer for Misuse:** The original creators disclaim all civil, criminal, and legal liabilities arising from third-party modifications or malicious redistributions of this codebase. Violators will be subject to maximum penalties under applicable laws.
+
+---
+
+### SECTION 5: DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
