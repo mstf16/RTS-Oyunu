@@ -230,6 +230,60 @@ namespace RTSProje
             state.CurrentState = WorkerStateType.Idle;
         }
 
+        // ------------------------------------------------------------
+        // KAYNAK YATAĞI DOĞURMA (SPAWN RESOURCE NODE)
+        // Bir taş ocağı ya da tarla parçası oluşturur. EconomyManager'daki
+        // SpawnUnit/SpawnBuilding'e benzer ama daha basit - kaynak
+        // yatağının canı, savaş değeri gibi şeyleri yok, sadece
+        // konumu ve ne kadar/nasıl üretim yaptığı var.
+        // ------------------------------------------------------------
+        public EntityHandle SpawnResourceNode(
+            ResourceType type,
+            int gridX,
+            int gridY,
+            float maxAmount,
+            float fullYieldRate,
+            float depletionThreshold,
+            float depletedYieldMultiplier,
+            float regenRatePerSecond)
+        {
+            EntityHandle entity = World.CreateEntity();
+            if (!entity.IsValid) return EntityHandle.Invalid;
+
+            int index = entity.Index;
+
+            _positions![index] = new Position
+            {
+                GridX = gridX,
+                GridY = gridY,
+                TargetGridX = gridX,
+                TargetGridY = gridY
+            };
+            _gridManager.GridToPixel(gridX, gridY, out float pixelX, out float pixelY);
+            _positions[index].PixelX = pixelX;
+            _positions[index].PixelY = pixelY;
+
+            _resourceDeposits![index] = new ResourceDeposit
+            {
+                Type = type,
+                CurrentAmount = maxAmount,
+                MaxAmount = maxAmount,
+                DepletionThreshold = depletionThreshold,
+                FullYieldRate = fullYieldRate,
+                DepletedYieldMultiplier = depletedYieldMultiplier,
+                RegenRatePerSecond = regenRatePerSecond,
+                RegenPaused = false
+            };
+
+            // Kaynak yatağı yolu tıkamaz - işçi üzerine/içine girip
+            // toplayabilsin diye engel olarak işaretlenmiyor.
+            CollisionFlag[] collisionFlags = World.GetArray<CollisionFlag>();
+            collisionFlags[index] = new CollisionFlag { IsBlocking = false, IsStatic = true };
+
+            RegisterResourceNode(entity);
+            return entity;
+        }
+
         public void SetNodeRegenPaused(EntityHandle node, bool paused)
         {
             if (!World.IsAlive(node)) return;

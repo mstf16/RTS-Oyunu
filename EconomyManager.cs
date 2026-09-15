@@ -74,6 +74,15 @@ namespace RTSProje
         private CollisionFlag[]? _collisionFlags;
         private BuildingConfidence[]? _buildingConfidences;
         private SupplyNode[]? _supplyNodes;
+        private WorkerState[]? _workerStates;
+
+        // WorkerBehavior burada CONSTRUCTOR'DAN verilmiyor - çünkü
+        // WorkerBehavior da EconomyManager'a ihtiyaç duyuyor (AddResource
+        // için). İkisi birbirini constructor'da bekleseydi hiçbiri hiç
+        // kurulamazdı (döngüsel bağımlılık). Bunun yerine ikisi ayrı ayrı
+        // kurulduktan SONRA, Program.cs'te SetWorkerBehavior ile "elden"
+        // tanıştırılacaklar.
+        private WorkerBehavior? _workerBehavior;
 
         private bool _isInitialized;
 
@@ -109,6 +118,7 @@ namespace RTSProje
             _collisionFlags = World.GetArray<CollisionFlag>();
             _buildingConfidences = World.GetArray<BuildingConfidence>();
             _supplyNodes = World.GetArray<SupplyNode>();
+            _workerStates = World.GetArray<WorkerState>();
 
             // Her takım 1. evreden (Başlangıç) başlar.
             for (int t = 0; t < MaxTeams; t++)
@@ -131,6 +141,16 @@ namespace RTSProje
             // Abone olunmuş bir event yok, temizlenecek bir şey yok.
         }
 
+        // Program.cs, hem EconomyManager hem WorkerBehavior kurulduktan
+        // SONRA bu metodu çağırıp ikisini birbirine tanıtacak.
+        public void SetWorkerBehavior(WorkerBehavior workerBehavior)
+        {
+            _workerBehavior = workerBehavior;
+        }
+
+        // Program.cs, hem EconomyManager hem WorkerBehavior kurulduktan
+        // SONRA bu metodu çağırıp ikisini birbirine tanıtacak.
+       
 
         // ------------------------------------------------------------
         // KAYNAK SORGU VE YÖNETİMİ
@@ -229,7 +249,11 @@ namespace RTSProje
                 AttackDamage = stats.AttackDamage,
                 AttackRange = stats.AttackRange,
                 AttackCooldown = stats.AttackCooldown,
-                ArmorValue = stats.ArmorValue
+                ArmorValue = stats.ArmorValue,
+                BaseArmorValue = stats.ArmorValue,
+                BaseAttackCooldown = stats.AttackCooldown,
+                IsSiegeUnit = stats.IsSiegeUnit,
+                SiegeDamageBonusVsBuildings = stats.SiegeDamageBonusVsBuildings
             };
 
             _movementSpeeds![index] = new MovementSpeed
@@ -285,6 +309,23 @@ namespace RTSProje
             // Diğer sistemlere "yeni bir birim doğdu" diye haber ver.
             _terrainPhysics.RegisterUnit(entity);
             _fogOfWar.RegisterUnit(entity);
+
+            // Bu bir işçiyse, görev döngüsünü Idle'da başlat ve
+            // WorkerBehavior'a kaydet. _workerBehavior henüz
+            // tanıştırılmadıysa (SetWorkerBehavior çağrılmadıysa)
+            // sessizce atlanır - bu bir hata değil, sadece o özelliğin
+            // henüz bağlanmadığı anlamına gelir.
+            if (stats.IsWorker)
+            {
+                _workerStates![index] = new WorkerState
+                {
+                    CurrentState = WorkerStateType.Idle,
+                    AssignedNode = EntityHandle.Invalid,
+                    AssignedDropoff = EntityHandle.Invalid
+                };
+
+                _workerBehavior?.RegisterWorker(entity);
+            }
 
             return entity;
         }

@@ -67,6 +67,11 @@ namespace RTSProje
         // (Faz 5) bu bayrağa bakıp "kuşatma mancınığı yakalandı,
         // savunmasız" gibi kuralları buradan tetikleyecek.
         public bool IsSiegeUnit { get; set; } = false;
+        
+        // Bu birim bir işçi mi? true ise EconomyManager, doğum anında
+        // WorkerState component'ini de hazırlayıp WorkerBehavior'a
+        // kaydediyor - böylece kaynak toplama döngüsüne girebiliyor.
+        public bool IsWorker { get; set; } = false;   
     }
 
     public class BuildingStatData
@@ -297,6 +302,25 @@ namespace RTSProje
         {
             return new List<UnitStatData>
             {
+                
+                 // 0) KÖYLÜ / İŞÇİ - savaşamaz, sadece kaynak toplar, 0 altın
+                new UnitStatData
+                {
+                    UnitId = "unit_villager",
+                    DisplayName = "Köylü",
+                    UnitClass = UnitClass.Melee,
+                    MaxHealth = 35f,
+                    AttackDamage = 1f,
+                    AttackRange = 0.8f,
+                    AttackCooldown = 2f,
+                    ArmorValue = 0f,
+                    MoveSpeed = 2.8f,
+                    VisionRadius = 5f,
+                    ProductionCost = new Dictionary<ResourceType, int> { { ResourceType.Food, 25 } },
+                    BuildTimeSeconds = 5f,
+                    IsWorker = true
+                },
+
                 // 1) ET SİPERİ - 0 altın, kalabalık, düşmanın ilk vuruşunu göğüsler
                 new UnitStatData
                 {

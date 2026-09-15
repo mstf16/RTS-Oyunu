@@ -136,19 +136,33 @@ namespace RTSProje
                 }
             }
 
-            // Eğer yok edilen şey bir BİNAYSA, içindeki herkesi dışarı çıkar veya öldür
-            // Burada "binayla beraber askerler de yok olur" mantığını seçiyoruz.
-            if (_garrisonedUnits.ContainsKey(e.Handle))
+            // Eğer yok edilen şey bir BİNAYSA, içindeki herkesi dışarı çıkar/öldür.
+            //
+            // ÖNEMLİ: Önce binayı DEFTERDEN SİLİYORUZ, sonra askerleri yok
+            // ediyoruz. Neden sıralama böyle? Çünkü her asker yok edilirken
+            // KENDİ EntityDestroyedEvent'ini fırlatıyor, bu da bu metodu
+            // TEKRAR (iç içe/recursive) çağırıyor. Eğer bina hâlâ deftere
+            // kayıtlıysa, o iç çağrı yukarıdaki "listeden sil" satırına
+            // girip AYNI ANDA gezdiğimiz listeyi değiştirmeye çalışır -
+            // bu da "Collection was modified" çökmesine sebep olur.
+            // Binayı ÖNCE silersek, iç çağrılar "bu bina zaten kayıtlı
+            // değil" deyip hiçbir şey yapmadan çıkar, çakışma olmaz.
+            if (_garrisonedUnits.TryGetValue(e.Handle, out List<EntityHandle>? occupants))
             {
-                List<EntityHandle> occupants = _garrisonedUnits[e.Handle];
-                foreach (var unit in occupants)
+                // Ayrıca listenin bir KOPYASINI (ToArray) alıyoruz - orijinal
+                // listeye artık kimse dokunmuyor olsa bile, bu ekstra bir
+                // güvenlik katmanı, "asla aynı listeyi hem okuyup hem
+                // değiştirme" prensibini net tutuyor.
+                EntityHandle[] occupantsCopy = occupants.ToArray();
+                _garrisonedUnits.Remove(e.Handle);
+
+                for (int i = 0; i < occupantsCopy.Length; i++)
                 {
-                    if (World.IsAlive(unit))
+                    if (World.IsAlive(occupantsCopy[i]))
                     {
-                        World.DestroyEntity(unit);
+                        World.DestroyEntity(occupantsCopy[i]);
                     }
                 }
-                _garrisonedUnits.Remove(e.Handle);
             }
         }
     }

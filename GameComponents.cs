@@ -83,8 +83,22 @@ namespace RTSProje
     {
         public float AttackDamage;   // Vurunca kaç can koparır?
         public float AttackRange;    // Kılıç mı sallar, uzaktan ok mu atar?
-        public float AttackCooldown; // İki tokat arasında kaç saniye soluklanması lazım?
-        public float ArmorValue;     // Gelen darbenin ne kadarını savuşturur?
+        public float AttackCooldown; // İki tokat arasında kaç saniye soluklanması lazım? (ANLIK, sinerjiye göre değişebilir)
+        public float ArmorValue;     // Gelen darbenin ne kadarını savuşturur? (ANLIK, sinerjiye göre değişebilir)
+
+        // Doğumda JSON'dan gelen, HİÇ DEĞİŞMEYEN orijinal değerler.
+        // System_DynamicSynergy her karede zırhı/cooldown'u SIFIRDAN
+        // bu değerlerden hesaplar - üstüne üstüne eklemez. Yoksa asker
+        // sinerji alanında durdukça zırhı sonsuza kadar büyürdü.
+        public float BaseArmorValue;
+        public float BaseAttackCooldown;
+
+        // Koçbaşı/mancınık gibi birimler bunu true taşır. CombatResolver,
+        // "bu saldırgan kuşatma birimi mi" diye buradan bakar - böylece
+        // "sadece kuşatma makinesi hasar verebilir" (FortifiedDefense)
+        // kuralını ve bina bonusunu uygulayabilir.
+        public bool IsSiegeUnit;
+        public float SiegeDamageBonusVsBuildings;
     }
 
 
@@ -301,6 +315,20 @@ public struct GarrisonTag
 {
     public bool IsGarrisoned;         // Asker şu an binanın içinde mi?
     public EntityHandle BuildingHandle; // Hangi binanın içinde?
+}
+
+
+// ------------------------------------------------------------
+// FORMATION MEMBER (Tabur Kimliği)
+// Bir askeri tabur düşün: tabur en yavaş askerin adımına göre
+// yürür, hızlılar öne fırlayıp düzeni bozmaz. Bu struct, bir
+// birimin HANGİ tabura ait olduğunu tutuyor. GroupId -1 ise
+// "hiçbir tabura ait değilim, kendi başıma yürürüm" demek.
+// ------------------------------------------------------------
+[StructLayout(LayoutKind.Sequential)]
+public struct FormationMember
+{
+    public int GroupId;
 }
 
 
