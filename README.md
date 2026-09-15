@@ -9,7 +9,7 @@ An experimental, highly optimized Real-Time Strategy (RTS) game engine built str
 This project explores how far low-tier hardware and free AI tools can be pushed to build a fully functional, performant RTS architecture. It demonstrates unit pathfinding, faction balancing, resource management, and unit pooling mechanics without requiring premium software subscriptions or high-end GPU setups.
 
 ### AI Stack Used
-* **Local Models:** Qwen 2.5 3B (via VS Code local setups)
+* **Local Models:** Deepsek R1 7B
 * **API / Cloud Free Tiers:** Gemini Flash API, Ollama Cloud (Gemma models), Claude Sonnet (low-usage free tier)
 
 ---
